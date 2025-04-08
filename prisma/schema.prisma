@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Represents a user authenticated via Clerk
+// Synced via Webhooks
+model User {
+  id          String       @id // Clerk User ID
+  email       String       @unique
+  firstName   String?
+  lastName    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  collections Collection[] // User can have multiple collections
+}
+
+// Represents a user-created collection
+model Collection {
+  id          String   @id @default(cuid()) // Or use auto-increment Int if preferred
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   // Foreign key linking to the User model
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade) // If user deleted, delete their collections
+
+  // Many-to-many relationship with Image through ImagesInCollections
+  images ImagesInCollections[]
+
+  @@index([userId])
+}
+
+// Represents an image from Unsplash stored for referencing in collections
+// Only store images that have been added to at least one collection
+model Image {
+  id              String   @id // Unsplash Image ID (unique)
+  description     String?
+  altDescription  String?
+  imageUrlSmall   String
+  imageUrlRegular String
+  imageUrlFull    String
+  authorName      String
+  authorLink      String   // Link to author's Unsplash profile
+  publishedAt     DateTime // Original publish date from Unsplash
+
+  createdAt DateTime @default(now()) // When it was first added to *any* collection in our DB
+
+  // Many-to-many relationship with Collection through ImagesInCollections
+  collections ImagesInCollections[]
+}
+
+// Join table for the many-to-many relationship between Image and Collection
+model ImagesInCollections {
+  imageId      String
+  collectionId String
+  addedAt      DateTime @default(now())
+
+  image        Image      @relation(fields: [imageId], references: [id], onDelete: Cascade) // If image is somehow deleted (shouldn't happen if logic is correct), remove links
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade) // If collection deleted, remove image links
+
+  @@id([imageId, collectionId]) // Composite primary key
+  @@index([collectionId])
+  @@index([imageId])
+  @@map("images_in_collections") // Optional: specify the table name explicitly
+}
