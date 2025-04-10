@@ -23,13 +23,8 @@ export default function RootLayout({
 		<ClerkProvider>
 			<html lang="en">
 				<body className={`${vietnamPro.className} font-light bg-white text-dark antialiased`}>
-					<div className="lg:hidden flex items-center justify-center min-h-screen">
-						<p className="text-2xl px-5 font-medium">Sorry, Need bigger screen to run the app.</p>
-					</div>
-					<div className="hidden lg:block">
-						<Header />
-						{children}
-					</div>
+					<Header />
+					{children}
 				</body>
 			</html>
 		</ClerkProvider>

@@ -7,3 +7,31 @@
 	--color-gray-2: #e5e7eb;
 	--color-gray-3: #6c727f;
 }
+
+.masonry-grid {
+	column-count: 1;
+	column-gap: 1rem;
+}
+
+@media (min-width: 640px) {
+	.masonry-grid {
+		column-count: 2;
+	}
+}
+
+@media (min-width: 768px) {
+	.masonry-grid {
+		column-count: 3;
+	}
+}
+
+@media (min-width: 1024px) {
+	.masonry-grid {
+		column-count: 4;
+	}
+}
+
+.masonry-item {
+	display: inline-block;
+	width: 100%;
+}
