@@ -4,14 +4,15 @@ import MaxWidthWrapper from "../MaxWidthWrapper";
 import Nav from "./Nav";
 import Image from "next/image";
 import { GlowEffect } from "../motion-primitives/glow-effect";
+import MobileHeader from "./MobileHeader";
 
 export default async function Header() {
 	return (
-		<div className="border-b border-gray-2 fixed inset-0 top-0 h-fit z-50 bg-white">
+		<div className=" border-b border-gray-2 fixed inset-0 top-0 h-fit z-50 bg-white">
 			<MaxWidthWrapper>
-				<header className="flex justify-between items-center py-3">
+				<header className="hidden sm:flex justify-between items-center py-3">
 					<Link href="/">
-						<Image src="/logo.svg" alt="logo" width={118} height={24} />
+						<Image src="/logo.svg" alt="logo" width={118} height={24} priority />
 					</Link>
 
 					<Nav />
@@ -45,6 +46,8 @@ export default async function Header() {
 						</div>
 					</SignedOut>
 				</header>
+
+				<MobileHeader />
 			</MaxWidthWrapper>
 		</div>
 	);

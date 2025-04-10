@@ -22,7 +22,7 @@ export default function RootLayout({
 	return (
 		<ClerkProvider>
 			<html lang="en">
-				<body className={`${vietnamPro.className} font-light bg-white text-dark antialiased`}>
+				<body className={`${vietnamPro.className} font-light bg-white text-dark antialiased overflow-x-hidden`}>
 					<Header />
 					{children}
 				</body>
