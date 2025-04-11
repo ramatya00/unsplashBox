@@ -22,7 +22,6 @@ export async function getUnsplashImageDetails(imageId: string) {
 export async function getUnsplashCollection(id: string) {
 	if (!id) throw new Error("Unsplash collection ID is required.");
 	try {
-		// Corresponds to GET /collections/:id
 		const data = await fetchUnsplash(`/collections/${encodeURIComponent(id)}`);
 		return data;
 	} catch (error) {
@@ -33,7 +32,7 @@ export async function getUnsplashCollection(id: string) {
 export async function getUnsplashCollectionPhotos(
 	id: string,
 	page: number = 1,
-	perPage: number = 10,
+	perPage: number = 20,
 	orientation?: "landscape" | "portrait" | "squarish"
 ) {
 	if (!id) throw new Error("Unsplash collection ID is required.");
@@ -45,7 +44,6 @@ export async function getUnsplashCollectionPhotos(
 	}
 
 	try {
-		// Corresponds to GET /collections/:id/photos
 		const data = await fetchUnsplash(endpoint);
 		return data;
 	} catch (error) {

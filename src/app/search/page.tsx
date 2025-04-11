@@ -3,11 +3,11 @@ import SearchResults from "@/ui/search/SearchResults";
 import { Suspense } from "react";
 import Loader from "@/ui/search/Loader";
 
-export default async function SearchPage({
-	searchParams,
-}: {
+type SearchPageProps = {
 	searchParams: Promise<{ query?: string; page?: string }>;
-}) {
+};
+
+export default async function SearchPage({ searchParams }: SearchPageProps) {
 	const params = await searchParams;
 	const query = params.query || "";
 	const page = parseInt(params.page || "1");

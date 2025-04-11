@@ -11,12 +11,10 @@ export default function CollectionPreview({
 }: CollectionPreviewProps) {
 	const imageCount = images.length;
 
-	// Function to render the image grid part
 	const renderImageGrid = () => {
-		// Handle case with no images
 		if (imageCount === 0) {
 			return (
-				<div className="flex items-center justify-center w-full h-[225px] bg-gray-2 rounded-lg text-gray-3">
+				<div className="flex items-center justify-center w-full h-[225px] bg-gray-2 rounded text-gray-3">
 					No Preview Available
 				</div>
 			);
@@ -25,7 +23,7 @@ export default function CollectionPreview({
 		// Layout for 1 image
 		if (imageCount === 1) {
 			return (
-				<div className="relative w-full h-[225px] rounded-lg overflow-hidden">
+				<div className="relative w-full h-[225px] rounded overflow-hidden">
 					<Image
 						src={images[0].url}
 						alt={images[0].slug || altText}
@@ -40,7 +38,7 @@ export default function CollectionPreview({
 		// Layout for 2 images
 		if (imageCount === 2) {
 			return (
-				<div className="grid grid-cols-2 gap-1 w-full h-[225px] rounded-lg overflow-hidden">
+				<div className="grid grid-cols-2 gap-1 w-full h-[225px] rounded overflow-hidden">
 					{images.slice(0, 2).map((photo) => (
 						<div key={photo.id} className="relative w-full h-full">
 							<Image
@@ -58,7 +56,7 @@ export default function CollectionPreview({
 
 		// Layout for 3 or more images (use the first 3 for the layout)
 		return (
-			<div className="grid grid-cols-4 grid-rows-2 gap-1 w-full h-[225px] rounded-lg overflow-hidden">
+			<div className="grid grid-cols-4 grid-rows-2 gap-1 w-full h-[225px] rounded overflow-hidden">
 				<div className="relative row-span-2 col-span-3">
 					<Image
 						src={images[0].url}
