@@ -15,36 +15,38 @@ export default async function Header() {
 						<Image src="/logo.svg" alt="logo" width={118} height={24} priority />
 					</Link>
 
-					<Nav />
+					<div className="flex items-center gap-6">
+						<Nav />
 
-					<SignedIn>
-						<div className={`w-[32px] h-[32px] rounded-full bg-gray-3`}>
-							<UserButton
-								appearance={{
-									elements: {
-										avatarBox: {
-											width: "32px",
-											height: "32px",
+						<SignedIn>
+							<div className={`w-[32px] h-[32px] rounded-full bg-gray-3`}>
+								<UserButton
+									appearance={{
+										elements: {
+											avatarBox: {
+												width: "32px",
+												height: "32px",
+											},
 										},
-									},
-								}}
-							/>
-						</div>
-					</SignedIn>
-					<SignedOut>
-						<div className="relative">
-							<GlowEffect
-								colors={["#0894FF", "#C959DD", "#FF2E54", "#FF9004"]}
-								mode="static"
-								blur="soft"
-							/>
-							<SignInButton mode="modal">
-								<button className="relative px-4 py-1.5 bg-dark text-white font-medium text-sm rounded-sm cursor-pointer ">
-									Sign In
-								</button>
-							</SignInButton>
-						</div>
-					</SignedOut>
+									}}
+								/>
+							</div>
+						</SignedIn>
+						<SignedOut>
+							<div className="relative">
+								<GlowEffect
+									colors={["#0894FF", "#C959DD", "#FF2E54", "#FF9004"]}
+									mode="static"
+									blur="soft"
+								/>
+								<SignInButton mode="modal">
+									<button className="relative px-4 py-1.5 bg-dark text-white font-medium text-sm rounded-sm cursor-pointer ">
+										Sign In
+									</button>
+								</SignInButton>
+							</div>
+						</SignedOut>
+					</div>
 				</header>
 
 				<MobileHeader />

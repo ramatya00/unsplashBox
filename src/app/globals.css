@@ -35,3 +35,9 @@
 	display: inline-block;
 	width: 100%;
 }
+
+.gradient-text {
+	background: linear-gradient(to right, #f2c593, #8a3282);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}

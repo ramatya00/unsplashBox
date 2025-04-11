@@ -14,24 +14,51 @@ export async function searchUnsplashImages(query: string, page: number = 1, perP
 		totalPages: data.total_pages,
 	};
 }
-
 export async function getUnsplashImageDetails(imageId: string) {
 	if (!imageId) return null;
 	const data = await fetchUnsplash(`/photos/${imageId}`);
-	return data; // Adjust based on actual Unsplash API response structure
+	return data;
+}
+export async function getUnsplashCollection(id: string) {
+	if (!id) throw new Error("Unsplash collection ID is required.");
+	try {
+		// Corresponds to GET /collections/:id
+		const data = await fetchUnsplash(`/collections/${encodeURIComponent(id)}`);
+		return data;
+	} catch (error) {
+		console.error("Unsplash API Error (getUnsplashCollection):", error);
+		throw new Error(`Failed to fetch Unsplash collection ${id}.`);
+	}
+}
+export async function getUnsplashCollectionPhotos(
+	id: string,
+	page: number = 1,
+	perPage: number = 10,
+	orientation?: "landscape" | "portrait" | "squarish"
+) {
+	if (!id) throw new Error("Unsplash collection ID is required.");
+
+	// Build the query string
+	let endpoint = `/collections/${encodeURIComponent(id)}/photos?page=${page}&per_page=${perPage}`;
+	if (orientation) {
+		endpoint += `&orientation=${orientation}`;
+	}
+
+	try {
+		// Corresponds to GET /collections/:id/photos
+		const data = await fetchUnsplash(endpoint);
+		return data;
+	} catch (error) {
+		console.error("Unsplash API Error (getUnsplashCollectionPhotos):", error);
+		throw new Error(`Failed to fetch photos for Unsplash collection ${id}.`);
+	}
 }
 
 // --- Collection Data (Requires Auth) ---
-
 export async function getCollections() {
 	const { userId } = await auth();
 	if (!userId) {
-		// Handle unauthenticated case - return pre-populated or empty array
-		// Option 1: Return empty
-		// return [];
-		// Option 2: Fetch 'demo' collections (e.g., where userId is null or a specific demo ID)
-		// return await prisma.collection.findMany({ where: { userId: 'DEMO_USER_ID_OR_NULL' }});
-		throw new Error("Not authenticated"); // Or return empty array based on requirements
+		throw new Error("Not authenticated");
 	}
 
 	try {

@@ -1,7 +1,6 @@
 import { searchUnsplashImages } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
-import { UnsplashPhoto } from "@/lib/types";
 
 export default async function SearchResults({ query, page }: { query: string; page: number }) {
 	const { photos, totalPages } = await searchUnsplashImages(query, page);
@@ -17,7 +16,8 @@ export default async function SearchResults({ query, page }: { query: string; pa
 	return (
 		<div className="mt-10">
 			<div className="masonry-grid">
-				{photos.map((photo: UnsplashPhoto) => (
+				{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+				{photos.map((photo: any) => (
 					<div key={photo.id} className="masonry-item mb-4 break-inside-avoid">
 						<Link href={`/photos/${photo.id}`} className="block">
 							<div className="relative rounded-sm overflow-hidden">

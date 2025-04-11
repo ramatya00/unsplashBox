@@ -1,7 +1,7 @@
+import SearchForm from "@/ui/SearchForm";
 import SearchResults from "@/ui/search/SearchResults";
 import { Suspense } from "react";
 import Loader from "@/ui/search/Loader";
-import Image from "next/image";
 
 export default async function SearchPage({
 	searchParams,
@@ -14,18 +14,7 @@ export default async function SearchPage({
 
 	return (
 		<>
-			<form action="/search" className="w-full h-fit relative max-w-[500px] mx-auto -mt-6">
-				<input
-					type="text"
-					name="query"
-					className="w-full p-4 px-5 bg-white rounded-lg relative border border-gray-2 text-sm shadow"
-					placeholder="Enter image keywords..."
-					defaultValue={query}
-				/>
-				<button type="submit" className="absolute right-0 top-0 mt-3.5 mr-4 cursor-pointer">
-					<Image src="/Search.svg" alt="search" width={26} height={26} />
-				</button>
-			</form>
+			<SearchForm defaultQuery={query} />
 			{query ? (
 				<Suspense key={`${query}-${page}`} fallback={<Loader message="Loading images..." />}>
 					<SearchResults query={query} page={page} />
