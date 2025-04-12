@@ -1,8 +1,6 @@
 import { getUnsplashCollection } from "@/lib/data";
 import AddNewCollectionButton from "@/ui/collections/AddNewCollection";
 import CollectionPreview from "@/ui/collections/CollectionPreview";
-import HeaderGradient from "@/ui/HeaderGradient";
-import MaxWidthWrapper from "@/ui/MaxWidthWrapper";
 import { SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -21,12 +19,7 @@ export default async function PublicCollectionPage() {
 	const collections = (await Promise.all(collectionPromises)).filter(Boolean);
 
 	return (
-		<MaxWidthWrapper>
-			<HeaderGradient title="Collections">
-				Explore the world through collections of beautiful photos free to use under the
-				<span className="font-medium underline">Unsplash License</span>.
-			</HeaderGradient>
-
+		<>
 			{collections.length > 0 ? (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mt-10">
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -36,7 +29,7 @@ export default async function PublicCollectionPage() {
 						const sourcePhotos = previewPhotos.length > 0 ? previewPhotos : coverPhoto ? [coverPhoto] : [];
 
 						// prettier-ignore
-						{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						const imagesForPreview = sourcePhotos.map((photo: any) => ({
 							id: photo.id,
 							slug: photo.slug || photo.alt_description || null,
@@ -64,6 +57,6 @@ export default async function PublicCollectionPage() {
 			) : (
 				<p className="text-center mt-16 text-gray-3">Could not load featured collections.</p>
 			)}
-		</MaxWidthWrapper>
+		</>
 	);
 }

@@ -114,10 +114,7 @@ export async function getImagesInCollection(collectionId: string) {
 				},
 			},
 			orderBy: {
-				// Optionally order images by when they were added to *this* specific collection
-				// This requires fetching the join table data as well, slightly more complex query
-				// Simpler: order by image creation date in our DB or published date
-				createdAt: "desc", // Or publishedAt: 'desc'
+				createdAt: "desc",
 			},
 		});
 		return images;

@@ -27,9 +27,8 @@ model User {
 
 // Represents a user-created collection
 model Collection {
-  id          String   @id @default(cuid()) // Or use auto-increment Int if preferred
+  id          String   @id @default(cuid()) 
   name        String
-  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   userId      String   // Foreign key linking to the User model
@@ -42,19 +41,12 @@ model Collection {
 }
 
 // Represents an image from Unsplash stored for referencing in collections
-// Only store images that have been added to at least one collection
 model Image {
   id              String   @id // Unsplash Image ID (unique)
-  description     String?
   altDescription  String?
-  imageUrlSmall   String
   imageUrlRegular String
-  imageUrlFull    String
-  authorName      String
-  authorLink      String   // Link to author's Unsplash profile
-  publishedAt     DateTime // Original publish date from Unsplash
-
-  createdAt DateTime @default(now()) // When it was first added to *any* collection in our DB
+  width 				Int
+  height 			Int
 
   // Many-to-many relationship with Collection through ImagesInCollections
   collections ImagesInCollections[]

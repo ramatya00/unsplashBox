@@ -1,8 +1,13 @@
+import { Photo } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
-import { PhotoGridProps } from "@/lib/types";
 
-export default function PhotoGrid({ photos, photoBaseUrl = "/photos/" }: PhotoGridProps) {
+type PhotoGridProps = {
+	photos: Photo[];
+	photoBaseUrl?: string;
+};
+
+export default function PhotoGrid({ photos, photoBaseUrl = "/photo/" }: PhotoGridProps) {
 	if (!photos || photos.length === 0) {
 		return null;
 	}
@@ -15,7 +20,7 @@ export default function PhotoGrid({ photos, photoBaseUrl = "/photos/" }: PhotoGr
 						<div className="relative rounded-sm overflow-hidden">
 							<Image
 								src={photo.urls.regular}
-								alt={photo.alt_description || photo.description || "Photo"}
+								alt={photo.alt_description || "Photo"}
 								width={photo.width}
 								height={photo.height}
 								className="w-full h-auto"

@@ -1,5 +1,11 @@
-import { PaginationControlsProps } from "@/lib/types";
 import Link from "next/link";
+
+type PaginationControlsProps = {
+	currentPage: number;
+	totalPages: number;
+	baseUrl: string;
+	pageParamName?: string;
+};
 
 export default function PaginationControls({
 	currentPage,

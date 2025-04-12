@@ -1,7 +1,13 @@
 import { getUnsplashCollectionPhotos } from "@/lib/data";
 import PaginationControls from "../PaginationControls";
 import PhotoGrid from "../PhotoGrid";
-import { CollectionPhotosGridProps } from "@/lib/types";
+
+type CollectionPhotosGridProps = {
+	collectionId: string;
+	currentPage: number;
+	photosPerPage: number;
+	totalPages: number;
+};
 
 export default async function CollectionPhotosGrid({
 	collectionId,

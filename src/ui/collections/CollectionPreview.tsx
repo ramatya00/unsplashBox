@@ -1,6 +1,14 @@
-import { CollectionPreviewProps } from "@/lib/types";
+import { PreviewImageCollection } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
+
+type CollectionPreviewProps = {
+	images: PreviewImageCollection[];
+	altText?: string;
+	href: string;
+	title: string;
+	photoCount: number;
+};
 
 export default function CollectionPreview({
 	images,
@@ -26,7 +34,7 @@ export default function CollectionPreview({
 				<div className="relative w-full h-[225px] rounded overflow-hidden">
 					<Image
 						src={images[0].url}
-						alt={images[0].slug || altText}
+						alt={altText}
 						fill
 						className="object-cover"
 						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -43,7 +51,7 @@ export default function CollectionPreview({
 						<div key={photo.id} className="relative w-full h-full">
 							<Image
 								src={photo.url}
-								alt={photo.slug || altText}
+								alt={altText}
 								fill
 								className="object-cover"
 								sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
@@ -60,7 +68,7 @@ export default function CollectionPreview({
 				<div className="relative row-span-2 col-span-3">
 					<Image
 						src={images[0].url}
-						alt={images[0].slug || altText}
+						alt={altText}
 						fill
 						className="object-cover"
 						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
@@ -69,7 +77,7 @@ export default function CollectionPreview({
 				<div className="relative">
 					<Image
 						src={images[1].url}
-						alt={images[1].slug || altText}
+						alt={altText}
 						fill
 						className="object-cover"
 						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
@@ -78,7 +86,7 @@ export default function CollectionPreview({
 				<div className="relative">
 					<Image
 						src={images[2].url}
-						alt={images[2].slug || altText}
+						alt={altText}
 						fill
 						className="object-cover"
 						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
@@ -92,9 +100,7 @@ export default function CollectionPreview({
 		<Link href={href} className="group block">
 			{renderImageGrid()}
 			<div className="ml-0.5">
-				<h2 className="mt-2 text-sm font-medium truncate group-hover:text-blue-600 transition-colors">
-					{title}
-				</h2>
+				<h2 className="mt-2 text-sm font-medium truncate group-hover:text-blue-600 transition-colors">{title}</h2>
 				<p className="text-xs text-gray-3">{photoCount} photos</p>
 			</div>
 		</Link>

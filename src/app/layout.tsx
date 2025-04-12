@@ -3,6 +3,8 @@ import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/ui/layout/Header";
+import QueryProvider from "@/lib/Providers";
+import { Toaster } from "sonner";
 
 const vietnamPro = Be_Vietnam_Pro({
 	subsets: ["latin"],
@@ -24,7 +26,9 @@ export default function RootLayout({
 			<html lang="en">
 				<body className={`${vietnamPro.className} font-light bg-white text-dark antialiased overflow-x-hidden`}>
 					<Header />
-					{children}
+					<QueryProvider>
+						{children} <Toaster richColors position="bottom-right" />
+					</QueryProvider>
 				</body>
 			</html>
 		</ClerkProvider>
