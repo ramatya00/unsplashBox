@@ -1,10 +1,10 @@
 import { getUnsplashCollection } from "@/lib/data";
-import AddNewCollectionButton from "@/ui/collections/AddNewCollection";
 import CollectionPreview from "@/ui/collections/CollectionPreview";
 import { SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { PUBLIC_COLLECTION_IDS } from "@/lib/utils";
+import { CollectionPreviewData } from "@/lib/types";
+import { redirect } from "next/navigation";
 
 export default async function PublicCollectionPage() {
 	const { userId } = await auth();
@@ -22,19 +22,9 @@ export default async function PublicCollectionPage() {
 		<>
 			{collections.length > 0 ? (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mt-10">
-					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-					{collections.map((collection: any) => {
+					{collections.map((collection: CollectionPreviewData) => {
 						const previewPhotos = collection.preview_photos || [];
-						const coverPhoto = collection.cover_photo;
-						const sourcePhotos = previewPhotos.length > 0 ? previewPhotos : coverPhoto ? [coverPhoto] : [];
-
-						// prettier-ignore
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						const imagesForPreview = sourcePhotos.map((photo: any) => ({
-							id: photo.id,
-							slug: photo.slug || photo.alt_description || null,
-							url: photo.urls?.small || photo.urls?.thumb || "",
-						}));
+						const imagesForPreview = previewPhotos.map((photo) => photo.urls.small);
 
 						return (
 							<CollectionPreview
@@ -50,7 +40,12 @@ export default async function PublicCollectionPage() {
 
 					{!userId && (
 						<SignInButton mode="modal">
-							<AddNewCollectionButton />
+							<div
+								className={`flex flex-col items-center justify-center w-full h-[225px] bg-gray-2 rounded text-gray-3 cursor-pointer hover:bg-gray-300 transition-colors duration-300`}
+							>
+								<h1 className="text-5xl">+</h1>
+								<h1 className="font-medium text-xl">Add new collection</h1>
+							</div>
 						</SignInButton>
 					)}
 				</div>

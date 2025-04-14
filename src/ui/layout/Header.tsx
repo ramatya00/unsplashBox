@@ -7,7 +7,7 @@ import MobileHeader from "./MobileHeader";
 
 export default async function Header() {
 	return (
-		<div className=" border-b border-gray-2 fixed inset-0 top-0 h-fit z-50 bg-white">
+		<div className=" border-b border-gray-2 fixed inset-0 top-0 h-fit z-10 bg-white">
 			<div className="max-w-7xl mx-auto px-4 lg:px-8">
 				<header className="hidden sm:flex justify-between items-center py-3">
 					<Link href="/">

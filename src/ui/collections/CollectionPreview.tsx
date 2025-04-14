@@ -1,13 +1,23 @@
-import { PreviewImageCollection } from "@/lib/types";
+"use client";
+
+import { deleteCollection } from "@/lib/actions";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import ModalWrapper from "./ModalCollection";
+import { DialogTrigger } from "../motion-primitives/dialog";
+import ConfirmModal from "../ConfirmModal";
 
 type CollectionPreviewProps = {
-	images: PreviewImageCollection[];
+	images: string[];
 	altText?: string;
 	href: string;
 	title: string;
 	photoCount: number;
+	collectionId: string;
+	userId?: string | null;
 };
 
 export default function CollectionPreview({
@@ -16,29 +26,34 @@ export default function CollectionPreview({
 	href,
 	title,
 	photoCount,
+	userId,
+	collectionId,
 }: CollectionPreviewProps) {
 	const imageCount = images.length;
 
+	const [showOptions, setShowOption] = useState(false);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+	const deleteMutation = useMutation({
+		mutationFn: deleteCollection,
+		onSuccess: () => {
+			toast.success(`Collection "${title}" deleted successfully.`);
+		},
+		onError: (error) => {
+			toast.error(`Failed to delete collection: ${error.message}`);
+		},
+	});
+
 	const renderImageGrid = () => {
 		if (imageCount === 0) {
-			return (
-				<div className="flex items-center justify-center w-full h-[225px] bg-gray-2 rounded text-gray-3">
-					No Preview Available
-				</div>
-			);
+			return <div className="flex items-center justify-center w-full h-[225px] bg-gray-2 rounded text-gray-3">No Preview Available</div>;
 		}
 
 		// Layout for 1 image
 		if (imageCount === 1) {
 			return (
 				<div className="relative w-full h-[225px] rounded overflow-hidden">
-					<Image
-						src={images[0].url}
-						alt={altText}
-						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-					/>
+					<Image src={images[0]} alt={altText} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
 				</div>
 			);
 		}
@@ -48,14 +63,8 @@ export default function CollectionPreview({
 			return (
 				<div className="grid grid-cols-2 gap-1 w-full h-[225px] rounded overflow-hidden">
 					{images.slice(0, 2).map((photo) => (
-						<div key={photo.id} className="relative w-full h-full">
-							<Image
-								src={photo.url}
-								alt={altText}
-								fill
-								className="object-cover"
-								sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
-							/>
+						<div key={photo} className="relative w-full h-full">
+							<Image src={photo} alt={altText} fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw" />
 						</div>
 					))}
 				</div>
@@ -66,43 +75,53 @@ export default function CollectionPreview({
 		return (
 			<div className="grid grid-cols-4 grid-rows-2 gap-1 w-full h-[225px] rounded overflow-hidden">
 				<div className="relative row-span-2 col-span-3">
-					<Image
-						src={images[0].url}
-						alt={altText}
-						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
-					/>
+					<Image src={images[0]} alt={altText} fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw" />
 				</div>
 				<div className="relative">
-					<Image
-						src={images[1].url}
-						alt={altText}
-						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
-					/>
+					<Image src={images[1]} alt={altText} fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw" />
 				</div>
 				<div className="relative">
-					<Image
-						src={images[2].url}
-						alt={altText}
-						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw"
-					/>
+					<Image src={images[2]} alt={altText} fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17vw" />
 				</div>
 			</div>
 		);
 	};
 
 	return (
-		<Link href={href} className="group block">
+		<div className="relative">
 			{renderImageGrid()}
-			<div className="ml-0.5">
-				<h2 className="mt-2 text-sm font-medium truncate group-hover:text-blue-600 transition-colors">{title}</h2>
-				<p className="text-xs text-gray-3">{photoCount} photos</p>
+			<div className="absolute bottom-0 left-0 h-[60px] px-3 bg-dark/50 text-white flex items-center justify-between w-3/5 rounded-tr-xs rounded-bl-sm">
+				<Link href={href} className="flex-grow overflow-hidden mr-2">
+					<h2 className="text-sm font-medium truncate">{title}</h2>
+					<p className="text-xs text-gray-400">
+						{photoCount} {photoCount === 1 ? "photo" : "photos"}
+					</p>
+				</Link>
+
+				{userId && (
+					<>
+						<button onClick={() => setShowOption((prev) => !prev)} className="cursor-pointer px-2 shrink-0">
+							<Image src="/3-dots.svg" alt="3 dots" width={16} height={800} />
+						</button>
+						{showOptions && (
+							<div className="absolute bottom-0 right-0 -translate-y-[80%] h-[60px] flex flex-col items-start bg-dark shadow-2xl text-white px-4 py-2 space-y-2 ">
+								<ModalWrapper mode="edit" initialData={{ name: title, collectionId }} closeDropdown={() => setShowOption(false)}>
+									<DialogTrigger className="text-xs font-medium cursor-pointer hover:text-gray-3">Edit</DialogTrigger>
+								</ModalWrapper>
+								<button className="text-xs font-medium cursor-pointer hover:text-gray-3" onClick={() => setShowDeleteModal(true)}>
+									Delete
+								</button>
+							</div>
+						)}
+						<ConfirmModal
+							isOpen={showDeleteModal}
+							onOpenChange={setShowDeleteModal}
+							message={`Are you sure you want to delete this collection ?`}
+							onConfirm={() => deleteMutation.mutate({ collectionId })}
+						/>
+					</>
+				)}
 			</div>
-		</Link>
+		</div>
 	);
 }

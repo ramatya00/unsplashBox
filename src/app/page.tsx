@@ -26,9 +26,9 @@ export default function Home() {
 						/>
 					</div>
 
-					<div className="text-center mb-8 -mt-20">
+					<div className="text-center mb-6 -mt-20">
 						<h1 className="font-semibold text-5xl tracking-tighter">Search</h1>
-						<p className="text-sm mt-2 mb-5">Search high-resolution images from Unsplash</p>
+						<p className="text-sm mt-2">Search high-resolution images from Unsplash</p>
 					</div>
 					<SearchForm defaultQuery="" />
 				</div>

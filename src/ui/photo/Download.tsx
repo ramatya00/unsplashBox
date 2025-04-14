@@ -61,7 +61,7 @@ export default function DownloadImage({
 	const filename =
 		downloadEndpoint && description ? description.replace(/\s+/g, "-").toLowerCase() : `unsplashBox-image`;
 
-	const mutation = useMutation<unknown, Error, DownloadVariables>({
+	const mutation = useMutation({
 		mutationFn: downloadImage,
 		onSuccess: () => {
 			toast.success("Image successfully downloaded!");

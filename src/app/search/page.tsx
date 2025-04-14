@@ -14,7 +14,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
 	return (
 		<>
-			<SearchForm defaultQuery={query} />
+			<div className="-mt-6">
+				<SearchForm defaultQuery={query} />
+			</div>
 			{query ? (
 				<Suspense key={`${query}-${page}`} fallback={<Loader message="Loading images..." />}>
 					<SearchResults query={query} page={page} />

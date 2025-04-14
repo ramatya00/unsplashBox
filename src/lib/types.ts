@@ -1,8 +1,4 @@
-export type PreviewImageCollection = {
-	id: string;
-	url: string;
-	slug: string | null;
-};
+import { Prisma } from "@prisma/client";
 
 export type Photo = {
 	id: string;
@@ -13,3 +9,28 @@ export type Photo = {
 	width: number;
 	height: number;
 };
+
+export type PhotoPreview = {
+	urls: {
+		small: string;
+	};
+};
+
+export type CollectionPreviewData = {
+	id: string;
+	title: string;
+	total_photos: number;
+	preview_photos: PhotoPreview[];
+};
+
+export type CollectionWithPreviewsAndCount = Prisma.CollectionGetPayload<{
+	include: {
+		images: {
+			select: { image: { select: { imageUrlSmall: true } } };
+			take: 3;
+		};
+		_count: {
+			select: { images: true };
+		};
+	};
+}>;

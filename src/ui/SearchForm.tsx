@@ -21,7 +21,7 @@ export default function SearchForm({ defaultQuery }: SearchFormProps) {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="w-full h-fit relative max-w-[500px] mx-auto -mt-6">
+		<form onSubmit={handleSubmit} className="w-full h-fit relative max-w-[500px] mx-auto">
 			<input
 				type="text"
 				name="query"
@@ -29,8 +29,8 @@ export default function SearchForm({ defaultQuery }: SearchFormProps) {
 				className="w-full p-4 px-5 bg-white rounded-lg relative border border-gray-2 text-sm shadow-sm"
 				placeholder="Enter image keywords..."
 			/>
-			<button type="submit" className="absolute right-0 top-0 mt-3.5 mr-4 cursor-pointer">
-				<Image src="/Search.svg" alt="search" width={26} height={26} />
+			<button type="submit" className="absolute right-0 top-0 mt-4 mr-4 cursor-pointer">
+				<Image src="/Search.svg" alt="search" width={24} height={24} />
 			</button>
 		</form>
 	);

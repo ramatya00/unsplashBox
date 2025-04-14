@@ -63,6 +63,20 @@ export async function getCollections() {
 		const collections = await prisma.collection.findMany({
 			where: { userId: userId },
 			orderBy: { createdAt: "desc" },
+			include: {
+				images: {
+					orderBy: { addedAt: "desc" },
+					take: 3,
+					select: {
+						image: {
+							select: { imageUrlSmall: true },
+						},
+					},
+				},
+				_count: {
+					select: { images: true },
+				},
+			},
 		});
 		return collections;
 	} catch (error) {
@@ -79,7 +93,7 @@ export async function getCollectionDetails(collectionId: string) {
 		const collection = await prisma.collection.findUnique({
 			where: {
 				id: collectionId,
-				userId: userId, // Ensure user owns the collection
+				userId: userId,
 			},
 		});
 		return collection;
@@ -94,17 +108,15 @@ export async function getImagesInCollection(collectionId: string) {
 	if (!userId) throw new Error("Not authenticated");
 
 	try {
-		// First, verify the user owns the collection
 		const collection = await prisma.collection.findUnique({
 			where: { id: collectionId, userId: userId },
-			select: { id: true }, // Only need to select something to confirm existence and ownership
+			select: { id: true },
 		});
 
 		if (!collection) {
 			throw new Error("Collection not found or access denied.");
 		}
 
-		// Now fetch the images linked to this collection
 		const images = await prisma.image.findMany({
 			where: {
 				collections: {
@@ -127,14 +139,13 @@ export async function getImagesInCollection(collectionId: string) {
 // Fetch collections an image belongs to *for the current user*
 export async function getCollectionsForImage(imageId: string) {
 	const { userId } = await auth();
-	if (!userId) return []; // Unauthenticated user sees no collections for the image
+	if (!userId) return [];
 
 	try {
 		const collections = await prisma.collection.findMany({
 			where: {
-				userId: userId, // Belongs to the current user
+				userId: userId,
 				images: {
-					// And contains the specific image
 					some: {
 						imageId: imageId,
 					},
@@ -148,30 +159,20 @@ export async function getCollectionsForImage(imageId: string) {
 	}
 }
 
-// Fetch collections for the "Add to Collection" modal/search
 // Needs to return collections owned by the user that *don't* contain the image
-export async function getAvailableCollectionsForImage(imageId: string, searchQuery?: string) {
+export async function getAvailableCollectionsForImage(imageId: string) {
 	const { userId } = await auth();
-	if (!userId) return []; // Cannot add if not logged in
+	if (!userId) return [];
 
 	try {
 		const whereClause: Prisma.CollectionWhereInput = {
 			userId: userId,
 			images: {
-				// Filter OUT collections that ALREADY contain the image
 				none: {
 					imageId: imageId,
 				},
 			},
 		};
-
-		// Add search query filter if provided
-		if (searchQuery) {
-			whereClause.name = {
-				contains: searchQuery,
-				mode: "insensitive", // Case-insensitive search
-			};
-		}
 
 		const collections = await prisma.collection.findMany({
 			where: whereClause,

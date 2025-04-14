@@ -130,7 +130,7 @@ export default async function ImagePage({ params }: ImagePageProps) {
 										</div>
 										<div className="ml-3">
 											<h4 className="font-medium">{collection.name}</h4>
-											{/* <p className="text-sm text-gray-600">X photos</p> */}
+											<p className="text-sm text-gray-600">X photos</p>
 										</div>
 									</div>
 									<div className="flex items-center">

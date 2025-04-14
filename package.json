@@ -1,39 +1,42 @@
 {
-  "name": "unsplash-box",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@clerk/nextjs": "^6.13.0",
-    "@prisma/client": "^6.5.0",
-    "@tanstack/react-query": "^5.71.10",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "motion": "^12.6.3",
-    "next": "15.2.4",
-    "prisma": "^6.5.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-hook-form": "^7.55.0",
-    "react-use-measure": "^2.1.7",
-    "sonner": "^2.0.3",
-    "svix": "^1.63.1",
-    "tailwind-merge": "^3.2.0"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+	"name": "unsplash-box",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"postinstall": "prisma generate"
+	},
+	"dependencies": {
+		"@clerk/nextjs": "^6.13.0",
+		"@hookform/resolvers": "^5.0.1",
+		"@prisma/client": "^6.5.0",
+		"@tanstack/react-query": "^5.71.10",
+		"clsx": "^2.1.1",
+		"date-fns": "^4.1.0",
+		"motion": "^12.6.5",
+		"next": "15.2.4",
+		"prisma": "^6.5.0",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-hook-form": "^7.55.0",
+		"react-use-measure": "^2.1.7",
+		"sonner": "^2.0.3",
+		"svix": "^1.63.1",
+		"tailwind-merge": "^3.2.0",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@eslint/eslintrc": "^3",
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"eslint": "^9",
+		"eslint-config-next": "15.2.4",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
 }

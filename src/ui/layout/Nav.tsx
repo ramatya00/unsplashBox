@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { AnimatedBackground } from "../motion-primitives/animated-background";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Nav() {
+	const { isSignedIn, userId } = useAuth();
 	const pathname = usePathname();
 	const activeValue = pathname.startsWith("/collections") ? "/collections" : pathname;
 	return (
@@ -20,7 +22,11 @@ export default function Nav() {
 				<Link href="/" className="px-4 py-1.5 font-medium text-sm" data-id="/">
 					Home
 				</Link>
-				<Link href="/collections" className="px-4 py-1.5 font-medium text-sm" data-id="/collections">
+				<Link
+					href={isSignedIn ? `/collections/${userId}` : "/collections"}
+					className="px-4 py-1.5 font-medium text-sm"
+					data-id="/collections"
+				>
 					Collections
 				</Link>
 			</AnimatedBackground>
