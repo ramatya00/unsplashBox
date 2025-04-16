@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CollectionSchema, TCollectionSchema } from "@/lib/zodSchema";
 import { createCollection, editCollection } from "@/lib/actions";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { searchUserCollections } from "@/lib/actions";
 import { Transition, Variants } from "motion/react";
 import { useState } from "react";
 
@@ -17,7 +18,7 @@ type ModalWrapperProps = {
 	closeDropdown?: () => void;
 };
 
-export default function ModalWrapper({ children, mode = "create", initialData, closeDropdown }: ModalWrapperProps) {
+export default function ModalCollection({ children, mode = "create", initialData, closeDropdown }: ModalWrapperProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const customVariants: Variants = {
@@ -30,7 +31,12 @@ export default function ModalWrapper({ children, mode = "create", initialData, c
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen} variants={customVariants} transition={customTransition}>
 			{children}
-			<ModalFormContent closeDialog={closeDialog} mode={mode} initialData={initialData} closeDropDown={closeDropdown} />
+			<ModalFormContent
+				closeDialog={closeDialog}
+				mode={mode}
+				initialData={initialData}
+				closeDropDown={closeDropdown}
+			/>
 		</Dialog>
 	);
 }
@@ -43,6 +49,14 @@ type ModalFormContentProps = {
 };
 
 function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: ModalFormContentProps) {
+	const queryClient = useQueryClient();
+
+	// Add query to get existing collections
+	const { data: existingCollections } = useQuery({
+		queryKey: ["collections"],
+		queryFn: () => searchUserCollections(""),
+	});
+
 	const {
 		register,
 		handleSubmit,
@@ -53,6 +67,31 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 		resolver: zodResolver(CollectionSchema),
 		defaultValues: mode === "edit" ? { name: initialData?.name || "" } : {},
 	});
+
+	const onSubmit = (data: TCollectionSchema) => {
+		// Check for duplicate names
+		const isDuplicate = existingCollections?.some(
+			(collection) =>
+				collection.name.toLowerCase() === data.name.trim().toLowerCase() &&
+				collection.id !== initialData?.collectionId
+		);
+
+		if (isDuplicate) {
+			setError("name", {
+				type: "manual",
+				message: "A collection with this name already exists.",
+			});
+			return;
+		}
+
+		if (data.name === initialData?.name) {
+			closeDialog();
+			if (closeDropDown) closeDropDown();
+			return;
+		}
+		mutation.mutate(data);
+		setError("root.serverError", {});
+	};
 
 	const mutation = useMutation({
 		mutationFn:
@@ -67,6 +106,8 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 		onSuccess: () => {
 			closeDialog();
 			if (closeDropDown) closeDropDown();
+			// Invalidate collections query to trigger a refresh
+			queryClient.invalidateQueries({ queryKey: ["collections"] });
 			toast.success(mode === "edit" ? "Collection updated successfully!" : "New collection created!");
 			reset();
 		},
@@ -78,24 +119,15 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 		},
 	});
 
-	const onSubmit = (data: TCollectionSchema) => {
-		if (data.name === initialData?.name) {
-			closeDialog();
-			if (closeDropDown) closeDropDown();
-			return;
-		}
-		mutation.mutate(data);
-		setError("root.serverError", {});
-	};
-
 	const handleCancel = () => {
 		reset();
 		setError("root.serverError", {});
 		closeDialog();
+		if (closeDropDown) closeDropDown();
 	};
 
 	return (
-		<DialogContent className="w-full max-w-md bg-white p-5 rounded-xs border-none backdrop-opacity-0">
+		<DialogContent className="w-full md:w-fit md:min-w-[500px] bg-white p-5 rounded-sm border-none backdrop-opacity-0">
 			<DialogHeader>
 				<DialogTitle className="text-xl font-medium text-center tracking-tighter">
 					{mode === "edit" ? "Edit Collection" : "Add Collection"}
@@ -129,7 +161,11 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 
 				<div className="flex justify-center pt-2 text-sm gap-2">
 					<SubmitButton pending={mutation.isPending} mode={mode} />
-					<button type="button" onClick={handleCancel} className="bg-white font-medium cursor-pointer px-4 py-1.5 rounded-sm">
+					<button
+						type="button"
+						onClick={handleCancel}
+						className="bg-white font-medium cursor-pointer px-4 py-1.5 rounded-sm"
+					>
 						Cancel
 					</button>
 				</div>

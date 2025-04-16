@@ -30,7 +30,7 @@ export default function SearchForm({ defaultQuery }: SearchFormProps) {
 				placeholder="Enter image keywords..."
 			/>
 			<button type="submit" className="absolute right-0 top-0 mt-4 mr-4 cursor-pointer">
-				<Image src="/Search.svg" alt="search" width={24} height={24} />
+				<Image src="/Search.svg" alt="search" width={22} height={22} />
 			</button>
 		</form>
 	);

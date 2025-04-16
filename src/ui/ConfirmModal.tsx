@@ -7,12 +7,13 @@ type ConfirmModalProps = {
 	onOpenChange: (open: boolean) => void;
 	message: string;
 	onConfirm: () => void;
+	closeDropDown?: () => void;
 };
 
-export default function ConfirmModal({ isOpen, onOpenChange, message, onConfirm }: ConfirmModalProps) {
+export default function ConfirmModal({ isOpen, onOpenChange, message, onConfirm, closeDropDown }: ConfirmModalProps) {
 	return (
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className="w-full max-w-md bg-white p-5 rounded-xs border-none backdrop-opacity-0">
+			<DialogContent className="w-full md:w-fit md:min-w-[500px] bg-white p-5 rounded-sm border-none backdrop-opacity-0">
 				<div className="text-sm">
 					<p>{message}</p>
 				</div>
@@ -27,7 +28,14 @@ export default function ConfirmModal({ isOpen, onOpenChange, message, onConfirm 
 					>
 						Confirm
 					</button>
-					<button onClick={() => onOpenChange(false)} type="button" className="bg-white font-medium px-4 py-1.5 rounded-sm cursor-pointer">
+					<button
+						onClick={() => {
+							onOpenChange(false);
+							if (closeDropDown) closeDropDown();
+						}}
+						type="button"
+						className="bg-white font-medium px-4 py-1.5 rounded-sm cursor-pointer"
+					>
 						Cancel
 					</button>
 				</div>

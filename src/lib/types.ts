@@ -2,17 +2,33 @@ import { Prisma } from "@prisma/client";
 
 export type Photo = {
 	id: string;
-	urls: {
-		regular: string;
-	};
-	alt_description?: string | null;
 	width: number;
 	height: number;
+	urls: {
+		raw: string;
+		full: string;
+		regular: string;
+		small: string;
+		thumb: string;
+	};
+	alt_description?: string;
+};
+
+export type DatabaseImage = {
+	id: string;
+	width: number;
+	height: number;
+	imageUrlRegular: string;
+	imageUrlSmall: string;
+	altDescription: string | null;
+	createdAt: Date;
+	updatedAt: Date;
 };
 
 export type PhotoPreview = {
 	urls: {
 		small: string;
+		regular: string;
 	};
 };
 
@@ -26,7 +42,7 @@ export type CollectionPreviewData = {
 export type CollectionWithPreviewsAndCount = Prisma.CollectionGetPayload<{
 	include: {
 		images: {
-			select: { image: { select: { imageUrlSmall: true } } };
+			select: { image: { select: { imageUrlRegular: true } } };
 			take: 3;
 		};
 		_count: {

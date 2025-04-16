@@ -10,7 +10,6 @@ type DownloadVariables = {
 };
 
 const downloadImage = async ({ downloadEndpoint, filename }: DownloadVariables) => {
-	let blobUrl = "";
 	try {
 		// 1. Fetch the download trigger URL from Unsplash API
 		const res = await fetch(downloadEndpoint);
@@ -29,25 +28,22 @@ const downloadImage = async ({ downloadEndpoint, filename }: DownloadVariables) 
 			throw new Error(`Failed to fetch image data: ${imageResponse.statusText} (${imageResponse.status})`);
 		}
 		const blob = await imageResponse.blob();
-		blobUrl = window.URL.createObjectURL(blob);
 
 		// 3. Create a temporary anchor to trigger the download
 		const a = document.createElement("a");
-		a.href = blobUrl;
+		a.href = URL.createObjectURL(blob);
 		const fileExtension = blob.type.split("/")[1] || "jpg";
 		a.download = `${filename}.${fileExtension}`;
+		a.style.display = "none";
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
+		URL.revokeObjectURL(a.href);
 
 		return { success: true };
 	} catch (error) {
 		console.error("Download failed:", error);
 		throw error;
-	} finally {
-		if (blobUrl) {
-			window.URL.revokeObjectURL(blobUrl);
-		}
 	}
 };
 
@@ -79,7 +75,7 @@ export default function DownloadImage({
 		<button
 			onClick={handleDownloadClick}
 			disabled={mutation.isPending}
-			className="flex items-center justify-center px-4 py-2 rounded-sm bg-gray-2 text-xs font-medium gap-2 hover:bg-gray-300 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+			className="flex items-center justify-center px-4 py-2 rounded-sm bg-gray-2 text-xs font-medium gap-2 hover:bg-gray-300 transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
 		>
 			<Image src="/down arrow.svg" alt="Download icon" width={16} height={16} />
 			{mutation.isPending ? "Downloading..." : "Download"}

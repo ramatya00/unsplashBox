@@ -26,9 +26,9 @@ export default function RootLayout({
 			<html lang="en">
 				<body className={`${vietnamPro.className} font-light bg-white text-dark antialiased overflow-x-hidden`}>
 					<Header />
-					<QueryProvider>
-						{children} <Toaster richColors position="bottom-right" />
-					</QueryProvider>
+					<QueryProvider>{children}</QueryProvider>
+
+					<Toaster richColors position="bottom-right" />
 				</body>
 			</html>
 		</ClerkProvider>

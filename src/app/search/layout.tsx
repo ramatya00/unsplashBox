@@ -5,7 +5,7 @@ export default function SearchLayout({ children }: { children: React.ReactNode }
 	return (
 		<div className="w-full min-h-screen">
 			{/* gradient header */}
-			<div className="relative w-full h-36">
+			<div className="relative w-full h-26 md:h-36">
 				<Image
 					src="/gradiend-bg.svg"
 					alt="gradient background"

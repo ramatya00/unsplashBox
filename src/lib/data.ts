@@ -69,7 +69,7 @@ export async function getCollections() {
 					take: 3,
 					select: {
 						image: {
-							select: { imageUrlSmall: true },
+							select: { imageUrlRegular: true },
 						},
 					},
 				},
@@ -86,14 +86,10 @@ export async function getCollections() {
 }
 
 export async function getCollectionDetails(collectionId: string) {
-	const { userId } = await auth();
-	if (!userId) throw new Error("Not authenticated");
-
 	try {
 		const collection = await prisma.collection.findUnique({
 			where: {
 				id: collectionId,
-				userId: userId,
 			},
 		});
 		return collection;
@@ -104,12 +100,9 @@ export async function getCollectionDetails(collectionId: string) {
 }
 
 export async function getImagesInCollection(collectionId: string) {
-	const { userId } = await auth();
-	if (!userId) throw new Error("Not authenticated");
-
 	try {
 		const collection = await prisma.collection.findUnique({
-			where: { id: collectionId, userId: userId },
+			where: { id: collectionId },
 			select: { id: true },
 		});
 
@@ -149,6 +142,21 @@ export async function getCollectionsForImage(imageId: string) {
 					some: {
 						imageId: imageId,
 					},
+				},
+			},
+			include: {
+				images: {
+					take: 1,
+					select: {
+						image: {
+							select: {
+								imageUrlSmall: true,
+							},
+						},
+					},
+				},
+				_count: {
+					select: { images: true },
 				},
 			},
 		});

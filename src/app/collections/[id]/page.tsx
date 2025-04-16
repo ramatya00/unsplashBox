@@ -4,7 +4,7 @@ import CollectionPreview from "@/ui/collections/CollectionPreview";
 import { DialogTrigger } from "@/ui/motion-primitives/dialog";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import ModalWrapper from "@/ui/collections/ModalCollection";
+import ModalCollection from "@/ui/collections/ModalCollection";
 
 type UserCollectionsProps = {
 	params: Promise<{ id: string }>;
@@ -24,13 +24,13 @@ export default async function UserCollections({ params }: UserCollectionsProps) 
 			{collections.length > 0 ? (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mt-10">
 					{collections.map((collection: CollectionWithPreviewsAndCount) => {
-						const imagesForPreview = collection.images.map((imgRelation) => imgRelation.image.imageUrlSmall);
+						const imagesForPreview = collection.images.map((imgRelation) => imgRelation.image.imageUrlRegular);
 						const photoCount = collection._count.images;
 
 						return (
 							<CollectionPreview
 								key={collection.id}
-								href={`/collection/${collection.id}/${id}`}
+								href={`/collection/${collection.id}/${userId}`}
 								images={imagesForPreview}
 								title={collection.name}
 								photoCount={photoCount}
@@ -41,14 +41,14 @@ export default async function UserCollections({ params }: UserCollectionsProps) 
 						);
 					})}
 
-					<ModalWrapper>
+					<ModalCollection>
 						<ModalTrigger />
-					</ModalWrapper>
+					</ModalCollection>
 				</div>
 			) : (
-				<ModalWrapper>
+				<ModalCollection>
 					<ModalTrigger className="mx-auto max-w-md mt-10" />
-				</ModalWrapper>
+				</ModalCollection>
 			)}
 		</>
 	);
