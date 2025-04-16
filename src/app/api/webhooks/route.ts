@@ -61,8 +61,6 @@ export async function POST(req: Request) {
 					data: {
 						id: evt.data.id,
 						email: evt.data.email_addresses[0].email_address,
-						firstName: evt.data.first_name,
-						lastName: evt.data.last_name,
 					},
 				});
 				console.log(`User ${evt.data.id} created in DB.`);
@@ -72,14 +70,11 @@ export async function POST(req: Request) {
 					where: { id: evt.data.id },
 					data: {
 						email: evt.data.email_addresses[0].email_address,
-						firstName: evt.data.first_name,
-						lastName: evt.data.last_name,
 					},
 				});
 				console.log(`User ${evt.data.id} updated in DB.`);
 				break;
 			case "user.deleted":
-				// Ensure cascading delete is set up in Prisma schema or handle related data deletion here
 				await prisma.user.delete({
 					where: { id: evt.data.id },
 				});
