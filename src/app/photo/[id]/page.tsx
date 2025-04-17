@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import DownloadImage from "@/ui/photo/Download";
 import { auth } from "@clerk/nextjs/server";
-import { SignInButton } from "@clerk/nextjs";
+import { SignUpButton } from "@clerk/nextjs";
 import { DialogTrigger } from "@/ui/motion-primitives/dialog";
 import AddToCollectionModal from "@/ui/photo/AddToCollectionModal";
 import RemoveFromCollection from "@/ui/photo/RemoveFromCollection";
@@ -33,9 +33,7 @@ export default async function ImagePage({ params }: ImagePageProps) {
 
 	if (!imageDetails) notFound();
 
-	const publishedDate = imageDetails.created_at
-		? format(new Date(imageDetails.created_at), "MMMM d, yyyy")
-		: "Date unknown";
+	const publishedDate = imageDetails.created_at ? format(new Date(imageDetails.created_at), "MMMM d, yyyy") : "Date unknown";
 	const altText = imageDetails.alt_description || imageDetails.description || `Photo by ${imageDetails.user.name}`;
 
 	const isLandscape = imageDetails.width > imageDetails.height;
@@ -71,20 +69,13 @@ export default async function ImagePage({ params }: ImagePageProps) {
 						/>
 						<div className="ml-3">
 							{imageDetails.user.portfolio_url ? (
-								<a
-									href={imageDetails.user.portfolio_url}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="font-medium hover:underline"
-								>
+								<a href={imageDetails.user.portfolio_url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
 									{imageDetails.user.name}
 								</a>
 							) : (
 								<h3 className="font-medium">{imageDetails.user.name}</h3>
 							)}
-							{imageDetails.user.location && (
-								<p className="text-xs text-gray-500">{imageDetails.user.location}</p>
-							)}
+							{imageDetails.user.location && <p className="text-xs text-gray-500">{imageDetails.user.location}</p>}
 						</div>
 					</div>
 
@@ -106,19 +97,8 @@ export default async function ImagePage({ params }: ImagePageProps) {
 								>
 									<DialogTrigger>
 										<div className="flex items-center justify-center px-4 py-2 gap-2 rounded-sm bg-gray-2 text-xs font-medium hover:bg-gray-300 transition-colors cursor-pointer">
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												className="h-4 w-4"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth="2"
-													d="M12 4v16m8-8H4"
-												></path>
+											<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
 											</svg>
 											Add to Collection
 										</div>
@@ -127,25 +107,14 @@ export default async function ImagePage({ params }: ImagePageProps) {
 							</div>
 						) : (
 							<div className="shrink-0">
-								<SignInButton mode="modal">
+								<SignUpButton mode="modal">
 									<button className="flex items-center justify-center px-4 py-2 gap-2 rounded-sm bg-gray-2 text-xs font-medium hover:bg-gray-300 transition-colors cursor-pointer">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											className="h-4 w-4"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth="2"
-												d="M12 4v16m8-8H4"
-											></path>
+										<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
 										</svg>
 										Add to Collection
 									</button>
-								</SignInButton>
+								</SignUpButton>
 							</div>
 						)}
 						<DownloadImage downloadEndpoint={downloadEndpoint} description={imageDetails.description} />
@@ -156,21 +125,10 @@ export default async function ImagePage({ params }: ImagePageProps) {
 					<div className="space-y-1">
 						{userId && userCollectionsForImage.length > 0 ? (
 							userCollectionsForImage.map((collection) => (
-								<div
-									key={collection.id}
-									className="flex gap-3 hover:bg-gray-2 p-2 rounded group transition-colors duration-500 mb-2"
-								>
-									<Link
-										href={`/collection/${collection.id}/${userId}`}
-										className="relative w-14 h-14 rounded overflow-hidden"
-									>
+								<div key={collection.id} className="flex gap-3 hover:bg-gray-2 p-2 rounded group transition-colors duration-500 mb-2">
+									<Link href={`/collection/${collection.id}/${userId}`} className="relative w-14 h-14 rounded overflow-hidden">
 										{collection.images[0] ? (
-											<Image
-												src={collection.images[0].image.imageUrlSmall}
-												alt={collection.name}
-												fill
-												className="object-cover"
-											/>
+											<Image src={collection.images[0].image.imageUrlSmall} alt={collection.name} fill className="object-cover" />
 										) : (
 											<div className="w-full h-full bg-gray-2" />
 										)}

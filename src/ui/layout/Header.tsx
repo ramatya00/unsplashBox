@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Nav from "./Nav";
 import Image from "next/image";
 import { GlowEffect } from "../motion-primitives/glow-effect";
@@ -34,11 +34,9 @@ export default async function Header() {
 						<SignedOut>
 							<div className="relative">
 								<GlowEffect colors={["#0894FF", "#C959DD", "#FF2E54", "#FF9004"]} mode="static" blur="soft" />
-								<SignInButton mode="modal">
-									<button className="relative px-4 py-1.5 bg-dark text-white font-medium text-sm rounded-sm cursor-pointer ">
-										Sign In
-									</button>
-								</SignInButton>
+								<SignUpButton mode="modal">
+									<button className="relative px-4 py-1.5 bg-dark text-white font-medium text-sm rounded-sm cursor-pointer ">Sign In</button>
+								</SignUpButton>
 							</div>
 						</SignedOut>
 					</div>
