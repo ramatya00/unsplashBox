@@ -112,45 +112,16 @@ export async function deleteCollection({ collectionId }: { collectionId: string 
 
 	const collection = await prisma.collection.findUnique({
 		where: { id: collectionId },
-		select: {
-			userId: true,
-			images: {
-				select: {
-					imageId: true,
-				},
-			},
-		},
 	});
 
 	if (!collection) throw new Error("Collection not found.");
 	if (collection.userId !== userId) throw new Error("Unauthorized: You do not own this collection.");
 
 	try {
-		// Get all image IDs in this collection
-		const imageIds = collection.images.map((img) => img.imageId);
-
 		// Delete the collection (this will cascade delete the ImagesInCollections entries)
 		await prisma.collection.delete({
 			where: { id: collectionId },
 		});
-
-		// For each image, check if it's used in other collections
-		// If not, delete the image
-		for (const imageId of imageIds) {
-			const imageUsageCount = await prisma.imagesInCollections.count({
-				where: {
-					imageId: imageId,
-				},
-			});
-
-			if (imageUsageCount === 0) {
-				await prisma.image.delete({
-					where: {
-						id: imageId,
-					},
-				});
-			}
-		}
 	} catch (error) {
 		console.error("Database Error deleting collection:", error);
 		throw new Error("Database Error: Failed to delete collection.");
@@ -273,7 +244,6 @@ export async function removeImageFromCollection({ imageId, collectionId }: { ima
 		});
 
 		if (!collection) throw new Error("Collection not found.");
-		if (collection.userId !== userId) throw new Error("Unauthorized: You do not own this collection.");
 
 		// Delete the association between the image and collection
 		await prisma.imagesInCollections.delete({
@@ -284,22 +254,6 @@ export async function removeImageFromCollection({ imageId, collectionId }: { ima
 				},
 			},
 		});
-
-		// Check if the image is used in any other collections
-		const imageUsageCount = await prisma.imagesInCollections.count({
-			where: {
-				imageId: imageId,
-			},
-		});
-
-		// If the image is not used in any other collections, delete it
-		if (imageUsageCount === 0) {
-			await prisma.image.delete({
-				where: {
-					id: imageId,
-				},
-			});
-		}
 
 		revalidatePath(`/collection/${collectionId}/${userId}`);
 		revalidatePath(`/collections/${userId}`);
