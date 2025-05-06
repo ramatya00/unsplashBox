@@ -4,21 +4,26 @@ import { DialogContent, DialogHeader, DialogTitle, Dialog } from "@/ui/motion-pr
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CollectionSchema, TCollectionSchema } from "@/lib/zodSchema";
-import { createCollection, editCollection } from "@/lib/actions";
+import { createCollection, editCollection, searchUserCollections } from "@/lib/actions";
 import { toast } from "sonner";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { searchUserCollections } from "@/lib/actions";
 import { Transition, Variants } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+type Collection = {
+	id: string;
+	name: string;
+	// Add other collection properties if available from searchUserCollections
+};
 
 type ModalWrapperProps = {
 	children: React.ReactNode;
 	mode?: "create" | "edit";
 	initialData?: { name: string; collectionId?: string };
 	closeDropdown?: () => void;
+	onCollectionCreated?: () => void; // Added for refresh
 };
 
-export default function ModalCollection({ children, mode = "create", initialData, closeDropdown }: ModalWrapperProps) {
+export default function ModalCollection({ children, mode = "create", initialData, closeDropdown, onCollectionCreated }: ModalWrapperProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const customVariants: Variants = {
@@ -36,6 +41,7 @@ export default function ModalCollection({ children, mode = "create", initialData
 				mode={mode}
 				initialData={initialData}
 				closeDropDown={closeDropdown}
+				onCollectionCreated={onCollectionCreated} // Pass down the callback
 			/>
 		</Dialog>
 	);
@@ -46,16 +52,25 @@ type ModalFormContentProps = {
 	mode: "create" | "edit";
 	initialData?: { name: string; collectionId?: string };
 	closeDropDown?: () => void;
+	onCollectionCreated?: () => void; // Added for refresh
 };
 
-function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: ModalFormContentProps) {
-	const queryClient = useQueryClient();
+function ModalFormContent({ closeDialog, mode, initialData, closeDropDown, onCollectionCreated }: ModalFormContentProps) {
+	const [existingCollections, setExistingCollections] = useState<Collection[]>([]);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	// Add query to get existing collections
-	const { data: existingCollections } = useQuery({
-		queryKey: ["collections"],
-		queryFn: () => searchUserCollections(""),
-	});
+	useEffect(() => {
+		const fetchCollections = async () => {
+			try {
+				const collections = await searchUserCollections("");
+				setExistingCollections(collections);
+			} catch {
+				// Handle error fetching collections, e.g., show a toast notification
+				toast.error("Failed to load existing collections.");
+			}
+		};
+		fetchCollections();
+	}, []);
 
 	const {
 		register,
@@ -68,7 +83,7 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 		defaultValues: mode === "edit" ? { name: initialData?.name || "" } : {},
 	});
 
-	const onSubmit = (data: TCollectionSchema) => {
+	const onSubmit = async (data: TCollectionSchema) => {
 		// Check for duplicate names
 		const isDuplicate = existingCollections?.some(
 			(collection) =>
@@ -89,35 +104,38 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 			if (closeDropDown) closeDropDown();
 			return;
 		}
-		mutation.mutate(data);
-		setError("root.serverError", {});
-	};
 
-	const mutation = useMutation({
-		mutationFn:
-			mode === "edit"
-				? (data: TCollectionSchema) => {
-						if (!initialData?.collectionId) {
-							throw new Error("Collection Id is required for editing.");
-						}
-						return editCollection({ ...data, collectionId: initialData.collectionId });
-				  }
-				: createCollection,
-		onSuccess: () => {
+		setIsSubmitting(true);
+		setError("root.serverError", {}); // Clear previous server errors
+
+		try {
+			if (mode === "edit") {
+				if (!initialData?.collectionId) {
+					throw new Error("Collection Id is required for editing.");
+				}
+				await editCollection({ ...data, collectionId: initialData.collectionId });
+			} else {
+				await createCollection(data);
+				onCollectionCreated?.(); // Call the callback after successful creation
+			}
 			closeDialog();
 			if (closeDropDown) closeDropDown();
-			// Invalidate collections query to trigger a refresh
-			queryClient.invalidateQueries({ queryKey: ["collections"] });
+			// TODO: Consider how to refresh the collections list if it's displayed elsewhere
+			// For example, you might pass a refresh function as a prop
+			// or use a global state management solution.
 			toast.success(mode === "edit" ? "Collection updated successfully!" : "New collection created!");
 			reset();
-		},
-		onError: (error) => {
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : "An unexpected server error occurred.";
 			setError("root.serverError", {
 				type: "server",
-				message: error.message || "An unexpected server error occurred.",
+				message,
 			});
-		},
-	});
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
 
 	const handleCancel = () => {
 		reset();
@@ -160,7 +178,7 @@ function ModalFormContent({ closeDialog, mode, initialData, closeDropDown }: Mod
 				</div>
 
 				<div className="flex justify-center pt-2 text-sm gap-2">
-					<SubmitButton pending={mutation.isPending} mode={mode} />
+					<SubmitButton pending={isSubmitting} mode={mode} />
 					<button
 						type="button"
 						onClick={handleCancel}

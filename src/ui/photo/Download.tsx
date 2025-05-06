@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useState } from "react";
 
 type DownloadVariables = {
 	downloadEndpoint: string;
@@ -57,28 +57,29 @@ export default function DownloadImage({
 	const filename =
 		downloadEndpoint && description ? description.replace(/\s+/g, "-").toLowerCase() : `unsplashBox-image`;
 
-	const mutation = useMutation({
-		mutationFn: downloadImage,
-		onSuccess: () => {
-			toast.success("Image successfully downloaded!");
-		},
-		onError: (error) => {
-			toast.error(`Download failed: ${error.message}`);
-		},
-	});
+	const [isDownloading, setIsDownloading] = useState(false);
 
-	const handleDownloadClick = () => {
-		mutation.mutate({ downloadEndpoint, filename });
+	const handleDownloadClick = async () => {
+		setIsDownloading(true);
+		try {
+			await downloadImage({ downloadEndpoint, filename });
+			toast.success("Image successfully downloaded!");
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : "An unexpected error occurred.";
+			toast.error(`Download failed: ${message}`);
+		} finally {
+			setIsDownloading(false);
+		}
 	};
 
 	return (
 		<button
 			onClick={handleDownloadClick}
-			disabled={mutation.isPending}
+			disabled={isDownloading}
 			className="flex items-center justify-center px-4 py-2 rounded-sm bg-gray-2 text-xs font-medium gap-2 hover:bg-gray-300 transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
 		>
 			<Image src="/down arrow.svg" alt="Download icon" width={16} height={16} />
-			{mutation.isPending ? "Downloading..." : "Download"}
+			{isDownloading ? "Downloading..." : "Download"}
 		</button>
 	);
 }

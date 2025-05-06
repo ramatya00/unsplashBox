@@ -1,7 +1,6 @@
 "use client";
 
 import { deleteCollection } from "@/lib/actions";
-import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,16 +32,26 @@ export default function CollectionPreview({
 
 	const [showOptions, setShowOption] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 
-	const deleteMutation = useMutation({
-		mutationFn: deleteCollection,
-		onSuccess: () => {
+	const handleDelete = async () => {
+		if (!collectionId) return;
+		setIsDeleting(true);
+		try {
+			await deleteCollection({ collectionId });
 			toast.success(`Collection "${title}" deleted successfully.`);
-		},
-		onError: (error) => {
-			toast.error(`Failed to delete collection: ${error.message}`);
-		},
-	});
+			setShowDeleteModal(false); // Close modal on success
+			setShowOption(false); // Close dropdown options
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(`Failed to delete collection: ${error.message}`);
+			} else {
+				toast.error("An unknown error occurred while deleting the collection.");
+			}
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 
 	const renderImageGrid = () => {
 		if (imageCount === 0) {
@@ -146,7 +155,7 @@ export default function CollectionPreview({
 								>
 									<DialogTrigger className="text-xs font-medium cursor-pointer">Edit</DialogTrigger>
 								</ModalWrapper>
-								<button className="text-xs font-medium cursor-pointer" onClick={() => setShowDeleteModal(true)}>
+								<button className="text-xs font-medium cursor-pointer" onClick={() => setShowDeleteModal(true)} disabled={isDeleting}>
 									Delete
 								</button>
 							</div>
@@ -155,11 +164,7 @@ export default function CollectionPreview({
 							isOpen={showDeleteModal}
 							onOpenChange={setShowDeleteModal}
 							message={`Are you sure you want to delete this collection ?`}
-							onConfirm={() => {
-								if (collectionId) {
-									deleteMutation.mutate({ collectionId });
-								}
-							}}
+							onConfirm={handleDelete}
 							closeDropDown={() => setShowOption(false)}
 						/>
 					</>

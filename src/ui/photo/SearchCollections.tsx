@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
 import { searchUserCollections, addImageToCollection } from "@/lib/actions";
 import ModalCollection from "../collections/ModalCollection";
 import { DialogTrigger } from "../motion-primitives/dialog";
@@ -24,6 +23,14 @@ function useDebounce<T>(value: T, delay: number): T {
 	return debouncedValue;
 }
 
+type Collection = {
+	id: string;
+	name: string;
+	images: { image: { imageUrlSmall: string } }[];
+	_count: { images: number };
+	// Add other properties from searchUserCollections if needed
+};
+
 type SearchCollectionsProps = {
 	onCollectionSelect?: (collectionId: string) => void;
 	imageId?: string;
@@ -39,14 +46,36 @@ type SearchCollectionsProps = {
 
 export default function SearchCollections({ imageId, imageData }: SearchCollectionsProps) {
 	const [searchTerm, setSearchTerm] = useState("");
+	const [collections, setCollections] = useState<Collection[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
 	const [addedCollectionIds, setAddedCollectionIds] = useState<string[]>([]);
 	const [loadingCollectionId, setLoadingCollectionId] = useState<string | null>(null);
+	const [refreshCounter, setRefreshCounter] = useState(0);
 	const debouncedSearch = useDebounce(searchTerm, 300);
 
-	const { data: collections, isLoading } = useQuery({
-		queryKey: ["collections", debouncedSearch, imageId],
-		queryFn: () => searchUserCollections(debouncedSearch, imageId),
-	});
+	const handleNewCollectionCreated = () => {
+		setRefreshCounter(prev => prev + 1);
+		// Optionally, clear search term to show all collections including the new one
+		// setSearchTerm(""); 
+	};
+
+	useEffect(() => {
+		const fetchCollections = async () => {
+			setIsLoading(true);
+			try {
+				const result = await searchUserCollections(debouncedSearch, imageId);
+				setCollections(result || []);
+			} catch (error) {
+				console.error("Failed to search collections:", error);
+				toast.error("Failed to search collections.");
+				setCollections([]); // Set to empty array on error
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchCollections();
+	}, [debouncedSearch, imageId, refreshCounter]);
 
 	// Filter out collections that have been added
 	const availableCollections = collections?.filter((collection) => !addedCollectionIds.includes(collection.id)) || [];
@@ -94,7 +123,7 @@ export default function SearchCollections({ imageId, imageData }: SearchCollecti
 			</form>
 
 			<div className="flex justify-end mb-4">
-				<ModalCollection>
+				<ModalCollection onCollectionCreated={handleNewCollectionCreated}>
 					<DialogTrigger className="flex items-center gap-2 px-4 py-2 bg-gray-2 rounded-sm text-xs font-medium hover:bg-gray-300 transition-colors">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
